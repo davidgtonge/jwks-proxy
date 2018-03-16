@@ -1,3 +1,8 @@
+// Some jwks endpoints are served with certs signed
+// by industry specific CAs. As this is a debugging
+// utility, such endpoints should be supported
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+
 const express = require("express")
 const cors = require("cors")
 const atob = require("atob")
