@@ -1,3 +1,5 @@
+'use strict'
+
 // Some jwks endpoints are served with certs signed
 // by industry specific CAs. As this is a debugging
 // utility, such endpoints should be supported
@@ -49,4 +51,4 @@ app.get("/:issuer", (req, res) => {
     })
 })
 
-app.listen(3001)
+module.exporta = app
