@@ -1,16 +1,14 @@
-'use strict'
-
-
-const express = require("express")
-const cors = require("cors")
+"use strict"
+const {parse, resolve} = require("url")
+const {send} = require("micro")
+const cors = require("micro-cors")()
 const atob = require("atob")
 const got = require("got")
-const URL = require("url")
 const path = require("path")
 
 const addToUrl = (url, trailing) => {
-  const { pathname } = URL.parse(url)
-  return URL.resolve(url, path.join(pathname, trailing))
+  const {pathname} = parse(url)
+  return resolve(url, path.join(pathname, trailing))
 }
 
 const hasWellKnown = url => url.indexOf(".well-known") !== -1
@@ -19,8 +17,8 @@ const getJWKS = url => {
   // Some jwks endpoints are served with certs signed
   // by industry specific CAs. As this is a debugging
   // utility, such endpoints should be supported
-  return got(url, { json: true, rejectUnauthorized: false })
-    .then(({ body }) => {
+  return got(url, {json: true, rejectUnauthorized: false})
+    .then(({body}) => {
       if (body.keys) {
         return body
       }
@@ -40,22 +38,20 @@ const getJWKS = url => {
     })
 }
 
-const app = express()
-app.use(cors())
-
-app.get("/:issuer", (req, res) => {
-  const issuer = atob(req.params.issuer)
+const handler = (req, res) => {
+  const {path} = parse(req.url, true)
+  const issuer = atob(path.replace("/", ""))
   if (issuer.indexOf("http") !== 0) {
-    return res.status(404).send()
+    return send(res, 404)
   }
   getJWKS(issuer)
     .then(data => {
-      res.json(data)
+      send(res, 200, data)
     })
     .catch(err => {
       console.log(err)
-      res.status(404).send()
+      send(res, 500, err)
     })
-})
+}
 
-module.exporta = app
+module.exports = cors(handler)
