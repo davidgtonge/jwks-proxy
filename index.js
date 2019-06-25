@@ -40,7 +40,9 @@ const getJWKS = url => {
 
 const handler = (req, res) => {
   const {path} = parse(req.url, true)
+  console.log(path, req.url)
   const issuer = atob(path.replace("/", ""))
+  console.log(issuer)
   if (issuer.indexOf("http") !== 0) {
     return send(res, 404)
   }
