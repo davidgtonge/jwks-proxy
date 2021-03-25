@@ -62,7 +62,7 @@ const handler = (req, res) => {
     })
     .catch(err => {
       console.log(err)
-      send(res, 500, err)
+      send(res, 404)
     })
 }
 
