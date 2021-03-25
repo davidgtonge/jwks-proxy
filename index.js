@@ -5,6 +5,7 @@ const cors = require("micro-cors")()
 const atob = require("atob")
 const got = require("got")
 const path = require("path")
+const isLocalIp = require("is-localhost-ip")
 
 const addToUrl = (url, trailing) => {
   const {pathname} = parse(url)
@@ -17,7 +18,7 @@ const getJWKS = url => {
   // Some jwks endpoints are served with certs signed
   // by industry specific CAs. As this is a debugging
   // utility, such endpoints should be supported
-  return got(url, {json: true, rejectUnauthorized: false})
+  return got(url, {responseType: "json", rejectUnauthorized: false})
     .then(({body}) => {
       if (body.keys) {
         return body
@@ -48,7 +49,14 @@ const handler = (req, res) => {
   if (issuer.indexOf("http") !== 0) {
     return send(res, 404)
   }
-  getJWKS(issuer)
+  isLocalIp(issuer)
+    .then(isLocal => {
+      console.log({isLocal})
+      if (isLocal) {
+        return send(res, 404)
+      }
+      return getJWKS(issuer)
+    })
     .then(data => {
       send(res, 200, data)
     })
