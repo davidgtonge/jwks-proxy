@@ -12,7 +12,7 @@
   "dependencies": {
     "atob": "^2.1.2",
     "cors": "^2.8.5",
-    "got": "^11.8.2",
+    "got": "^12.5.3",
     "is-localhost-ip": "^1.4.0",
     "micro": "^9.3.4",
     "micro-cors": "^0.1.1"
